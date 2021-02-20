@@ -1,0 +1,61 @@
+show databases;
+use knowprogram;
+create table clubs(Club_registration_no int, name VARCHAR(20), type VARCHAR(20), hiring smallint, start_timings int, end_timings int, Location varchar(20),
+ owner VARCHAR(20), number_of_employees int, number_of_members int, registration_fee float(1), rating smallint, Mobile_number int);
+ describe club;
+ 
+ create table general_user(User_ID int, Name VARCHAR(20), gender CHAR, City VARCHAR(20), age int,  Mobile_number int,
+ Transaction_status int, Membership_status Varchar(20),  Scheduled_Time DATE);
+ 
+ 
+create table events( Name VARCHAR(20), Date DATE, STATUS varchar(20), City VARCHAR(20), About varchar(100),  Club_Associated int, Instructor_ID int,
+ Number_of_people_participating int);
+
+create table event_coordinators( Name VARCHAR(20), Event_History int, Payment_fees int, Mobile_Number int, Type_of_events varchar(100),  Location varchar(20), Rating int);
+
+create table event_coaching_instructors( Name VARCHAR(20),  Payment_fees int, Mobile_Number int, EMAIL varchar(20), Type_of_events varchar(100),  Location varchar(20),
+ Rating int);
+
+create table club_admin( Name VARCHAR(20),  Age int, Gender char, Mobile_Number int, EmailID varchar(20), Associated_Club_ID int);
+
+create table transactions(Sender_ID int, Reciever_ID int, Mode_of_Payment varchar(20), Date_of_payment DATE, Amount int);
+
+ALTER TABLE general_user
+ADD CONSTRAINT identify_unique_user PRIMARY KEY (User_ID);
+
+ALTER TABLE clubs
+ADD CONSTRAINT identify_unique_club PRIMARY KEY (Club_registration_no);
+
+ALTER TABLE club_admin
+ADD CONSTRAINT club_ad_details foreign key (Associated_Club_ID) references clubs(Club_registration_no); 
+
+ALTER TABLE events
+ADD CONSTRAINT event_associated_to foreign key (Club_Associated) references clubs(Club_registration_no); 
+
+ALTER TABLE transactions
+ADD CONSTRAINT transactions_ibfk_1 foreign key (Sender_ID) references general_user(User_ID);
+
+ALTER TABLE general_user
+ADD CONSTRAINT age_constraint CHECK (age >= 18);
+
+ALTER TABLE general_user
+ADD CONSTRAINT gender_constraint CHECK (gender = "F" or gender ="M" or gender = "O");
+
+ALTER TABLE clubs
+ADD CONSTRAINT rating_constraint CHECK (rating >= 1 or rating <= 7);
+
+ALTER TABLE event_coordinators
+ADD CONSTRAINT rating_constraint_coord CHECK (rating >= 1 or rating <= 7);
+
+ALTER TABLE event_coordinators
+ADD CONSTRAINT rating_constraint_coord CHECK (rating >= 1 or rating <= 7);
+
+ALTER TABLE transactions
+ADD CONSTRAINT mode_restrictions CHECK (Mode_of_Payment = 'ONLINE' or Mode_of_Payment = 'CHEQUE' or Mode_of_Payment = "CASH" 
+or Mode_of_Payment = "CREDIT_CARD");
+
+alter table club_admin add constraint chk_email check (EmaillID like '%_@__%.__%');
+
+alter table event_coaching_instructors add constraint chk_email_instructors check (EMAILID like '%_@__%.__%');
+
+alter table event_coaching_instructors add constraint chk_email_instructors check (EMAILID like '%_@__%.__%');
