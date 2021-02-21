@@ -1,0 +1,56 @@
+show databases;
+use portal;
+
+create table users(User_ID varchar(20), Name VARCHAR(20),age int,  gender CHAR, City VARCHAR(15),  Mobile_number varchar(20));
+create table clubs(club_ID varchar(20), Name VARCHAR(20), type varchar(20),  Location VARCHAR(15),  Timeslots DATE, Fee Int, Rating Float, Admin_ID varchar(20) );
+create table coaching_instructors( instructor_id varchar(20), Activity varchar(20), Salary int, Rating float, club_id varchar(20));
+create table event_coordinators(ec_id varchar(20), Contact_Number varchar(15), Name varchar(20), age int, gender char(1),rating float, fee int);
+create table event_organising_job( Application_no VARCHAR(20), Club_id varchar(20), club_name varchar(20),  fee int, events_ varchar(20));
+create table coaching_jobs( Application_no VARCHAR(20), Club_id varchar(20), club_name varchar(20), minimum_experience  int, position varchar(20) , salary int);
+create table events_( Event_name VARCHAR(20), coordinator_id varchar(20), date DATE, venue varchar(20), type_ varchar(20), club varchar(20), timing date);
+create table membership_userclub(user_id varchar(20), club_id varchar(20));
+create table event_coordinator_club(coordinator_id varchar(20), club_id varchar(20));
+create table instructor_payment(instructor_id varchar(20), club_id varchar(20), amount int);
+create table club_payment(user_id varchar(20), club_id varchar(20), amount int);
+create table event_coordinator_payment(club_id varchar(20), ec_id varchar(20), amount int);
+create table club_slot(club_id varchar(20), timeslot varchar(20));
+create table club_admin(Employee_ID varchar(20), Name VARCHAR(20),  Age int, Gender char, Mobile_Number varchar(15),  Associated_Club_ID varchar(20));
+create table transactions(Sender_ID int, Reciever_ID int, Mode_of_Payment varchar(20), Date_of_payment DATE, Amount int);
+
+
+
+ALTER TABLE users ADD CONSTRAINT identify_unique_user PRIMARY KEY (User_ID);
+ALTER TABLE coaching_instructors ADD CONSTRAINT identify_unique_instructor PRIMARY KEY (instructor_ID);
+ALTER TABLE clubs ADD CONSTRAINT identify_unique_club PRIMARY KEY (club_ID);
+ALTER TABLE event_organising_job ADD CONSTRAINT identify_unique_event PRIMARY KEY (application_no);
+ALTER TABLE coaching_jobs ADD CONSTRAINT identify_unique_coaching_job PRIMARY KEY (application_no);
+ALTER TABLE club_admin ADD CONSTRAINT identify_unique_club_admin PRIMARY KEY (employee_id);
+ALTER TABLE coaching_jobs ADD CONSTRAINT identify_unique_coaching_job PRIMARY KEY (application_no);
+ALTER TABLE club_slot ADD CONSTRAINT club_slot_id  PRIMARY KEY (club_id, timeslot);
+
+ALTER TABLE coaching_instructors ADD CONSTRAINT instructors_relationship foreign key (club_id) references clubs(club_id) ; 
+ALTER TABLE event_organising_job ADD CONSTRAINT event_to_club foreign key (club_id) references clubs(club_id) ;
+ALTER TABLE coaching_jobs ADD CONSTRAINT coaching_job_in_clubs foreign key (club_id) references clubs(club_id) ;
+ALTER TABLE events_ ADD CONSTRAINT coordinator_event foreign key (coordinator_id) references event_coordinators(ec_id ) ;
+ALTER TABLE membership_userclub ADD CONSTRAINT membership_users_user foreign key (user_id) references users(user_id);
+ALTER TABLE membership_userclub ADD CONSTRAINT membership_users_clubID foreign key (club_id) references clubs(club_id);
+ALTER TABLE event_coordinator_club ADD CONSTRAINT event_coordinator_club_coo foreign key (coordinator_id) references event_coordinators(ec_id );
+ALTER TABLE event_coordinator_club ADD CONSTRAINT event_coordinator_club_club foreign key (club_id) references clubs(club_id);
+ALTER TABLE instructor_payment ADD CONSTRAINT instructor_ref foreign key (instructor_id) references coaching_instructors(instructor_id ) ;
+ALTER TABLE instructor_payment ADD CONSTRAINT instructor_ref_club foreign key (club_id) references clubs(club_id ) ;
+ALTER TABLE club_payment ADD CONSTRAINT club_ref_user foreign key (user_id) references users(user_id ) ;
+ALTER TABLE club_payment ADD CONSTRAINT club_ref_club foreign key (club_id) references clubs(club_id ) ;
+ALTER TABLE event_coordinator_payment ADD CONSTRAINT club_id foreign key (club_id) references clubs(club_id ) ;
+ALTER TABLE event_coordinator_payment ADD CONSTRAINT ec_id foreign key (ec_id) references clubs(club_id) ;
+ALTER TABLE club_payment ADD CONSTRAINT club_ref_user foreign key (user_id) references users(user_id ) ;
+ALTER TABLE club_payment ADD CONSTRAINT club_ref_club_pay foreign key (club_id) references clubs(club_id ) ;
+ALTER TABLE event_coordinator_club ADD CONSTRAINT event_coordinator_club_club foreign key (club_id) references clubs(club_id);
+ALTER TABLE event_coordinator_club ADD CONSTRAINT event_coordinator_club_coo foreign key (coordinator_id) references event_coordinator(ec_id ) ;
+ALTER TABLE club_slot ADD CONSTRAINT CLUB_ID_REF foreign key (club_id) references clubs(club_id);
+ALTER TABLE club_admin ADD CONSTRAINT club_admin_stuff foreign key (associated_club_id) references clubs(club_id);
+
+ALTER TABLE users ADD CONSTRAINT age_constraint CHECK (age >= 18);
+ALTER TABLE users ADD CONSTRAINT gender_constraint CHECK (gender = "F" or gender ="M");
+ALTER TABLE clubs ADD CONSTRAINT rating_constraint CHECK (rating >= 1 or rating <= 5);
+ALTER TABLE event_coordinators ADD CONSTRAINT rating_constraint_coord CHECK (rating >= 1 or rating <= 7);
+ALTER TABLE club_slot ADD CONSTRAINT days_valid CHECK (timeslot = "MONDAY" or timeslot = "TUESDAY" or timeslot = "WEDNESDAY" or timeslot = "THURSDAY" or timeslot = "FRIDAY" or timeslot = "SATURDAY" or timeslot = "SUNDAY");
