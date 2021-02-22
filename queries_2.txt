@@ -1,5 +1,6 @@
+create database aj21; 
 show databases;
-use portal;
+use aj21;
 
 create table users(User_ID varchar(20) NOT NULL, Name VARCHAR(20) NOT NULL, age int NOT NULL,  gender CHAR NOT NULL, City VARCHAR(20),  Mobile_number varchar(15));
 create table clubs(club_ID varchar(20) NOT NULL, Name VARCHAR(20) NOT NULL, type varchar(20),  Location VARCHAR(50) NOT NULL,  Fee Int NOT NULL, Rating Float , Admin_ID varchar(20) NOT NULL unique);
@@ -7,7 +8,7 @@ create table coaching_instructors(instructor_id varchar(20), Name varchar(20) NO
 create table event_coordinators(ec_id varchar(20), Contact_Number varchar(15) NOT NULL UNIQUE, Name varchar(20) NOT NULL, age int NOT NULL, gender char(1),rating float, fee int, City varchar(20));
 create table event_organising_job( Application_no VARCHAR(20), Club_id varchar(20), club_name varchar(20),  fee int, events_ varchar(20));
 create table coaching_jobs( Application_no VARCHAR(20), Club_id varchar(20), club_name varchar(20) NOT NULL, minimum_experience  int NOT NULL, position varchar(20) NOT NULL, salary int NOT NULL);
-create table events_(Event_id varchar(20), Event_name VARCHAR(20), coordinator_id varchar(20) NOT NULL, date_ DATE NOT NULL, venue varchar(20) NOT NULL, type_ varchar(20) , club varchar(20) NOT NULL, timing date NOT NULL);
+create table events_(Event_id varchar(20), Event_name VARCHAR(20), coordinator_id varchar(20) NOT NULL, date_ DATE NOT NULL, venue varchar(20) NOT NULL, type_ varchar(20) , club varchar(20) NOT NULL, timing TIME NOT NULL);
 create table membership_userclub(user_id varchar(20), club_id varchar(20));
 create table event_coordinator_club(coordinator_id varchar(20), club_id varchar(20), EVENT_ID varchar(20) unique not null);
 create table instructor_payment(instructor_id varchar(20), club_id varchar(20), amount int, Date_ date);
@@ -25,7 +26,6 @@ ALTER TABLE clubs ADD CONSTRAINT identify_unique_club PRIMARY KEY (club_ID);
 ALTER TABLE event_organising_job ADD CONSTRAINT identify_unique_event PRIMARY KEY (application_no);
 ALTER TABLE coaching_jobs ADD CONSTRAINT identify_unique_coaching_job PRIMARY KEY (application_no);
 ALTER TABLE club_admin ADD CONSTRAINT identify_unique_club_admin PRIMARY KEY (employee_id);
-ALTER TABLE coaching_jobs ADD CONSTRAINT identify_unique_coaching_job PRIMARY KEY (application_no);
 ALTER TABLE club_slot ADD CONSTRAINT club_slot_id  PRIMARY KEY (club_id, timeslot);
 ALTER TABLE event_coordinators ADD CONSTRAINT event_coordinator_id primary key (ec_id);
 ALTER TABLE events_ ADD CONSTRAINT event_id primary key (event_id);
@@ -45,20 +45,18 @@ ALTER TABLE club_payment ADD CONSTRAINT club_ref_user foreign key (user_id) refe
 ALTER TABLE club_payment ADD CONSTRAINT club_ref_club foreign key (club_id) references clubs(club_id );
 ALTER TABLE event_coordinator_payment ADD CONSTRAINT club_id foreign key (club_id) references clubs(club_id ) ;
 ALTER TABLE event_coordinator_payment ADD CONSTRAINT ec_id foreign key (ec_id) references event_coordinators(ec_id) ;
-ALTER TABLE club_payment ADD CONSTRAINT club_ref_user foreign key (user_id) references users(user_id ) ;
 ALTER TABLE club_payment ADD CONSTRAINT club_ref_club_pay foreign key (club_id) references clubs(club_id ) ;
 ALTER TABLE club_slot ADD CONSTRAINT CLUB_ID_REF foreign key (club_id) references clubs(club_id) on delete cascade;
-ALTER TABLE club_admin ADD CONSTRAINT club_admin_stuff foreign key (associated_club_id) references clubs(club_id) on delete cascade;
 ALTER TABLE clubs ADD CONSTRAINT club_admin_id_ref foreign key (Admin_ID) references club_admin(employee_id) on delete cascade;
-ALTER TABLE instructor_hiring ADD CONSTRAINT club_instructor_timeslot foreign key (timeslot) references club_slot(timeslot) on delete cascade;
+ALTER TABLE instructor_hiring ADD CONSTRAINT club_instructor_timeslot foreign key (club_id, timeslot) references club_slot(club_id, timeslot) on delete cascade;
 
 ALTER TABLE users ADD CONSTRAINT age_constraint CHECK (age >= 18 and age <= 150);
 ALTER TABLE coaching_instructors ADD CONSTRAINT age_constraint2 CHECK (age >= 18 and age <= 150);
 ALTER TABLE event_coordinators ADD CONSTRAINT age_constraint3 CHECK (age >= 18 and age <= 150);
 ALTER TABLE club_admin ADD CONSTRAINT age_constraint4 CHECK (age >= 18 and age <= 150);
 ALTER TABLE users ADD CONSTRAINT gender_constraint CHECK (gender = "F" or gender ="M");
-ALTER TABLE coaching_instructors ADD CONSTRAINT gender_constraint2 CHECK (gender = "F" or gender ="M");
-ALTER TABLE event_coordinators ADD CONSTRAINT gender_constraint3 CHECK (gender = "F" or gender ="M");
+ALTER TABLE coaching_instructors ADD CONSTRAINT gender_constraint2 CHECK (gender = "F" or gender ="M" or gender = "O");
+ALTER TABLE event_coordinators ADD CONSTRAINT gender_constraint3 CHECK (gender = "F" or gender ="M" or gender = "O");
 ALTER TABLE club_admin ADD CONSTRAINT gender_constraint4 CHECK (gender = "F" or gender ="M");
 
 ALTER TABLE clubs ADD CONSTRAINT fee_valid CHECK (fee >= 0);
@@ -69,17 +67,128 @@ ALTER TABLE coaching_jobs ADD CONSTRAINT fee_valid3 CHECK (salary >= 0);
 
 ALTER TABLE clubs ADD CONSTRAINT rating_constraint CHECK (rating >= 1 or rating <= 5);
 ALTER TABLE event_coordinators ADD CONSTRAINT rating_constraint_coord CHECK (rating >= 1 or rating <= 5);
-ALTER TABLE club_slot ADD CONSTRAINT days_valid CHECK (timeslot = "MONDAY" or timeslot = "TUESDAY" or timeslot = "WEDNESDAY" or timeslot = "THURSDAY" or timeslot = "FRIDAY" or timeslot = "SATURDAY" or timeslot = "SUNDAY");
 
-
-
-INSERT INTO  users VALUES ("Ayushi123", "AyushiJain", 18, "F", "BlahBlah", "8007298123");
-select * from users;
 
 SET GLOBAL local_infile = 1;
-LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop/data.xls'
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\Club.xls'
+INTO TABLE clubs
+FIELDS TERMINATED BY ','
+ENCLOSED BY '' 
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from clubs;
+
+SET GLOBAL local_infile = 1;
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\Event.xls'
+INTO TABLE events_
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from events_;
+
+SET GLOBAL local_infile = 1;
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\Club_Admin.xls'
+INTO TABLE club_admin
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from club_admin;
+
+SET GLOBAL local_infile = 1;
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\CoachInstructor.xls'
+INTO TABLE coaching_instructors
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from coaching_instructors;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\Instructor_payment.xls'
+INTO TABLE instructor_payment
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from instructor_payment;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\EventOrganisingJobs_final.xls'
+INTO TABLE event_organising_job
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from event_organising_job;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\Club_Payment.xls'
+INTO TABLE club_payment
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from club_payment;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\Club_Timeslot.xls'
+INTO TABLE club_slot
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from club_slot;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\event_coordinator_payment.xls'
+INTO TABLE event_coordinator_payment
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from event_coordinator_payment;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\coaching_jobs.xls'
+INTO TABLE coaching_jobs
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from coaching_jobs;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\EventCoordinator.xls'
+INTO TABLE event_coordinators
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from event_coordinators;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\MembershipUserClub_final.xls'
+INTO TABLE membership_userclub
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from membership_userclub;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\User.xls'
 INTO TABLE users
 FIELDS TERMINATED BY ','
 ENCLOSED BY ''
-LINES TERMINATED BY '\n';
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from users;
 
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_2\\event_coordinator_club_relationship.xls'
+INTO TABLE event_coordinator_club
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from event_coordinator_club;
+
+LOAD DATA LOCAL INFILE 'C:\\Users\\ayush\\OneDrive\\Desktop\\DB\\AJ_4\\instructor_hiring.xls'
+INTO TABLE instructor_hiring
+FIELDS TERMINATED BY ','
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
+select * from instructor_hiring;
